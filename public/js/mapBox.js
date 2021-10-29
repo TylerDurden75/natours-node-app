@@ -2,7 +2,8 @@
 const locations = JSON.parse(document.getElementById('map').dataset.locations);
 console.log(locations);
 
-mapboxgl.accessToken = process.env.MAPBOX_TOKEN;
+mapboxgl.accessToken =
+  'pk.eyJ1IjoicmF5dGkiLCJhIjoiY2t2Yzh0cjdnMmdwbzJyb2ttMGk5cXZnOSJ9.Ts_1ASzBWOTrqDecosMn8ww';
 var map = new mapboxgl.Map({
   container: 'map',
   style: 'mapbox://styles/rayti/ckvccf9dm2ctb15o8wai2m5l6',
