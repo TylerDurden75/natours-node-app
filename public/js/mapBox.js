@@ -3,13 +3,15 @@ const locations = JSON.parse(document.getElementById('map').dataset.locations);
 console.log(locations);
 
 mapboxgl.accessToken =
-  'pk.eyJ1IjoicmF5dGkiLCJhIjoiY2t2Y2txZDI1NnEwejMwczcwY3MyY28zdiJ9.MwcDHkHvzlxIRVJ2lsCm6g';
+  'pk.eyJ1IjoicmF5dGkiLCJhIjoiY2t2Z3BwMWYzMWJwNTMwbjN6djRxMHZsNiJ9.1oTHB80Hc-LzYfb-gPhuwQ';
+
 var map = new mapboxgl.Map({
   container: 'map',
-  style: 'mapbox://styles/rayti/ckvccf9dm2ctb15o8wai2m5l6',
+  style: 'mapbox://styles/rayti/ckvgptkhf075z14oavl5oeqqv',
   scrollZoom: false,
   // center: [-118.113491, 34.111745],
   // zoom: 6,
+  // interactive: false,
 });
 
 const bounds = new mapboxgl.LngLatBounds();
@@ -19,7 +21,7 @@ locations.forEach((loc) => {
   const el = document.createElement('div');
   el.className = 'marker';
 
-  // Add Marker
+  // Add marker
   new mapboxgl.Marker({
     element: el,
     anchor: 'bottom',
@@ -27,7 +29,7 @@ locations.forEach((loc) => {
     .setLngLat(loc.coordinates)
     .addTo(map);
 
-  // App Pop-Up
+  // Add Popup
   new mapboxgl.Popup({
     offset: 30,
   })
@@ -35,7 +37,6 @@ locations.forEach((loc) => {
     .setHTML(`<p>Day ${loc.day}: ${loc.description}</p>`)
     .addTo(map);
 
-  // Extend map bounds to include current location
   bounds.extend(loc.coordinates);
 });
 
