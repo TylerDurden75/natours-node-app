@@ -65,7 +65,7 @@ const sendErrorProd = (err, req, res) => {
   if (err.isOperational) {
     res.status(err.statusCode).render('error', {
       title: 'Something went wrong!',
-      mesg: err.message,
+      msg: err.message,
     });
   }
   // Programming or other error: no leak error to client
@@ -74,7 +74,7 @@ const sendErrorProd = (err, req, res) => {
   //2) send message
   return res.status(err.statusCode).render('error', {
     title: 'Something went wrong!',
-    mesg: 'Please try again later',
+    msg: 'Please try again later',
   });
 };
 
