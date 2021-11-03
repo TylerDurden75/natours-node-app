@@ -1,3 +1,4 @@
+/* eslint-disable no-dupe-keys */
 const path = require('path');
 const express = require('express');
 const morgan = require('morgan');
@@ -26,26 +27,7 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Set Securtiy HTTP headers
-app.use(
-  helmet.contentSecurityPolicy({
-    directives: {
-      defaultSrc: ["'self'", 'data:', 'blob:'],
-
-      fontSrc: ["'self'", 'https:', 'data:'],
-
-      scriptSrc: ["'self'", 'unsafe-inline'],
-
-      // eslint-disable-next-line no-dupe-keys
-      scriptSrc: ["'self'", 'https://*.cloudflare.com'],
-
-      scriptSrcElem: ["'self'", 'https:', 'https://*.cloudflare.com'],
-
-      styleSrc: ["'self'", 'https:', 'unsafe-inline'],
-
-      connectSrc: ["'self'", 'data', 'https://*.cloudflare.com'],
-    },
-  })
-);
+app.use(helmet());
 
 // Dev logging
 if (process.env.NODE_ENV === 'development') {
