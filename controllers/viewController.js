@@ -46,15 +46,27 @@ exports.getTour = catchAsync(async (req, res, next) => {
 });
 
 exports.getLoginForm = (req, res) => {
-  res.status(200).render('login', {
-    title: 'Log into your account',
-  });
+  res
+    .status(200)
+    .set(
+      'Content-Security-Policy',
+      "default-src * self blob: data: gap:; style-src * self 'unsafe-inline' blob: data: gap:; script-src * 'self' 'unsafe-eval' 'unsafe-inline' blob: data: gap:; object-src * 'self' blob: data: gap:; img-src * self 'unsafe-inline' blob: data: gap:; connect-src self * 'unsafe-inline' blob: data: gap:; frame-src * self blob: data: gap:;"
+    )
+    .render('login', {
+      title: 'Log into your account',
+    });
 };
 
 exports.getAccount = (req, res) => {
-  res.status(200).render('account', {
-    title: 'Your Account',
-  });
+  res
+    .status(200)
+    .set(
+      'Content-Security-Policy',
+      "default-src * self blob: data: gap:; style-src * self 'unsafe-inline' blob: data: gap:; script-src * 'self' 'unsafe-eval' 'unsafe-inline' blob: data: gap:; object-src * 'self' blob: data: gap:; img-src * self 'unsafe-inline' blob: data: gap:; connect-src self * 'unsafe-inline' blob: data: gap:; frame-src * self blob: data: gap:;"
+    )
+    .render('account', {
+      title: 'Your Account',
+    });
 };
 
 exports.updateUserData = catchAsync(async (req, res, next) => {
@@ -69,8 +81,14 @@ exports.updateUserData = catchAsync(async (req, res, next) => {
       runValidators: true,
     }
   );
-  res.status(200).render('account', {
-    title: 'Your Account',
-    user: updatedUser,
-  });
+  res
+    .status(200)
+    .set(
+      'Content-Security-Policy',
+      "default-src * self blob: data: gap:; style-src * self 'unsafe-inline' blob: data: gap:; script-src * 'self' 'unsafe-eval' 'unsafe-inline' blob: data: gap:; object-src * 'self' blob: data: gap:; img-src * self 'unsafe-inline' blob: data: gap:; connect-src self * 'unsafe-inline' blob: data: gap:; frame-src * self blob: data: gap:;"
+    )
+    .render('account', {
+      title: 'Your Account',
+      user: updatedUser,
+    });
 });
