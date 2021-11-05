@@ -1,6 +1,7 @@
 const Review = require('../models/reviewModel');
+const Booking = require('../models/bookingModel');
 const AppError = require('../utils/appError');
-// const catchAsync = require('../utils/catchAsync');
+const catchAsync = require('../utils/catchAsync');
 const factory = require('./handlerFactory');
 
 // Middleware running before createOne
@@ -11,6 +12,14 @@ exports.setTourUserIds = (req, res, next) => {
 
   next();
 };
+
+exports.isBookedTour = catchAsync(async (req, res, next) => {
+  const { tour, user } = req.body;
+  const booking = await Booking.find({ tour, user });
+  if (!(booking.length > 0))
+    return next(new AppError('Please book tour before reviewing!', 400));
+  next();
+});
 
 exports.checkIfAuhtor = async (req, res, next) => {
   const review = await Review.findById(req.params.id);

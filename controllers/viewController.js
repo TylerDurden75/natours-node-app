@@ -43,6 +43,14 @@ exports.getTour = catchAsync(async (req, res, next) => {
     return next(new AppError('There is no tour with that name', 400));
   }
 
+  if (res.locals.user) {
+    const bookings = await Booking.find({
+      user: res.locals.user.id,
+      tour: tour.id,
+    });
+    res.locals.isBookedTour = bookings.length > 0;
+  }
+
   res
     .status(200)
     .set(
@@ -56,6 +64,9 @@ exports.getTour = catchAsync(async (req, res, next) => {
 });
 
 exports.getLoginForm = (req, res) => {
+  if (res.locals.user) {
+    return res.redirect('/');
+  }
   res
     .status(200)
     .set(
