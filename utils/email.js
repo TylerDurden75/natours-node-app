@@ -53,6 +53,10 @@ module.exports = class Email {
     await this.newTransport().sendMail(mailOptions);
   }
 
+  async sendEmailCheck() {
+    await this.send('check', 'Check your email');
+  }
+
   async sendWelcome() {
     await this.send('welcome', 'Welcome to the NodeTours Family!');
   }

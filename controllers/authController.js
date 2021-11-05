@@ -37,17 +37,63 @@ const createSendToken = (user, statusCode, req, res) => {
 };
 
 exports.signup = catchAsync(async (req, res, next) => {
+  const token = await crypto.randomBytes(32).toString('hex');
+  const emailToken = await crypto
+    .createHash('sha256')
+    .update(token)
+    .digest('hex');
+
+  const emailExpirationToken = Date.now() + 10 * 60 * 1000;
+
+  const { name, email, password, passwordConfirm, passwordChangeAt } = req.body;
   const newUser = await User.create({
-    name: req.body.name,
-    email: req.body.email,
-    password: req.body.password,
-    passwordConfirm: req.body.passwordConfirm,
+    name,
+    email,
+    password,
+    passwordConfirm,
+    passwordChangeAt,
+    emailToken,
+    emailExpirationToken,
   });
-  const url = `${req.protocol}://${req.get('host')}/me`;
+
+  const url = `${req.protocol}://${req.get(
+    'host'
+  )}/api/v1/users/emailCheck/${token}`;
   // console.log(url);
+
+  await new Email(newUser, url).sendEmailCheck();
+
+  res.status(201).json({
+    status: 'success',
+    data: {},
+  });
+  // createSendToken(newUser, 201, req, res);
+});
+
+exports.emailCheck = catchAsync(async (req, res, next) => {
+  const hashedToken = await crypto
+    .createHash('sha256')
+    .update(req.params.token)
+    .digest('hex');
+
+  const newUser = await User.findOne({
+    emailToken: hashedToken,
+    emailExpirationToken: { $gt: Date.now() },
+  });
+
+  if (!newUser) return next(new AppError('Token unvalid or expired', 400));
+  const url = `${req.protocol}://${req.get('host')}/me`;
+
+  newUser.emailChecked = true;
+  newUser.emailToken = undefined;
+  newUser.emailExpirationToken = undefined;
+
+  await newUser.save({ validateBeforeSave: false });
   await new Email(newUser, url).sendWelcome();
 
-  createSendToken(newUser, 201, req, res);
+  res.status(201).render('checked', {
+    title: 'Email verified successfully!',
+  });
 });
 
 exports.login = catchAsync(async (req, res, next) => {
@@ -242,4 +288,22 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
 
   //4) Log user in, send JWT
   createSendToken(user, 200, req, res);
+});
+
+exports.confirmSignup = catchAsync(async (req, res, next) => {
+  const { token } = req.params;
+
+  const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
+
+  const user = await User.findById(decoded.id).select('+validated');
+  if (!user) {
+    return next(new AppError('There is no user for this token', 401));
+  }
+  if (user.validated) {
+    return next(new AppError('This account has already been validated', 400));
+  }
+
+  user.validated = true;
+  await user.save({ validateBeforeSave: false });
+  createSendToken(user, 200, res);
 });
