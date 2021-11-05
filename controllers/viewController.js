@@ -1,5 +1,6 @@
 const Tour = require('../models/tourModel');
 const User = require('../models/userModel');
+const Review = require('../models/reviewModel');
 const Booking = require('../models/bookingModel');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
@@ -134,5 +135,35 @@ exports.updateUserData = catchAsync(async (req, res, next) => {
     .render('account', {
       title: 'Your Account',
       user: updatedUser,
+    });
+});
+
+exports.getMyReviews = catchAsync(async (req, res) => {
+  const reviews = await Review.find({ user: req.user.id })
+    .select('-user')
+    .populate('tour');
+  res
+    .status(200)
+    .set(
+      'Content-Security-Policy',
+      "default-src * self blob: data: gap:; style-src * self 'unsafe-inline' blob: data: gap:; script-src * 'self' 'unsafe-eval' 'unsafe-inline' blob: data: gap:; object-src * 'self' blob: data: gap:; img-src * self 'unsafe-inline' blob: data: gap:; connect-src self * 'unsafe-inline' blob: data: gap:; frame-src * self blob: data: gap:;"
+    )
+    .render('review', {
+      title: 'My Reviews',
+      reviews,
+    });
+});
+
+exports.getFavorites = catchAsync(async (req, res, next) => {
+  const favoriteTours = await User.findById(req.user.id).select('favorite');
+  res
+    .status(200)
+    .set(
+      'Content-Security-Policy',
+      "default-src * self blob: data: gap:; style-src * self 'unsafe-inline' blob: data: gap:; script-src * 'self' 'unsafe-eval' 'unsafe-inline' blob: data: gap:; object-src * 'self' blob: data: gap:; img-src * self 'unsafe-inline' blob: data: gap:; connect-src self * 'unsafe-inline' blob: data: gap:; frame-src * self blob: data: gap:;"
+    )
+    .render('overview', {
+      title: 'My Favorites',
+      tours: favoriteTours.favorite,
     });
 });
